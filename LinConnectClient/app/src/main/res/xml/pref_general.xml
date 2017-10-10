@@ -45,6 +45,12 @@
             android:key="pref_application"
             android:summary="@string/pref_application_summary"
             android:title="@string/pref_application" />
+        <EditTextPreference
+            android:key="pref_ssid"
+            android:summary="@string/pref_ssid_summary"
+            android:title="@string/pref_ssid"
+            android:singleLine="true" />
+
         <Preference
             android:enabled="false"
             android:summary="@string/pref_additional_options_summary"

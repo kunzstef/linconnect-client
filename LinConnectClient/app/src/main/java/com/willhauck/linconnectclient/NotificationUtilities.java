@@ -65,6 +65,21 @@ public class NotificationUtilities {
         // whether notifications are enabled for specific application
         if (prefs.getBoolean("pref_toggle", true)
                 && prefs.getBoolean(packageName, true) && mWifi.isConnected()) {
+            String ssid = mWifi.getExtraInfo();
+            boolean ssidAllowed = false;
+
+            if (ssid != null) {
+                String ssidPref = prefs.getString("pref_ssid", null);
+                String[] ssids = (ssidPref == null || ssidPref.length() == 0) ? new String[0] : ssidPref.split(",");
+                ssid = ssid.replace("\"", "");
+                for (int i = 0; i < ssids.length && !ssidAllowed; i++)
+                    if (ssids[i].equals(ssid))
+                        ssidAllowed = true;
+            }
+
+            if (!ssidAllowed)
+                return false;
+
             String ip = prefs.getString("pref_ip", "0.0.0.0:9090");
 
             // Magically extract text from notification
@@ -91,7 +106,6 @@ public class NotificationUtilities {
             } else {
                 return false;
             }
-
 
             for (int i = 2; i < notificationData.size(); i++) {
                 notificationBody += "\n" + notificationData.get(i);
@@ -137,11 +151,11 @@ public class NotificationUtilities {
             post.setEntity(entity);
 
             try {
-                post.addHeader("notifheader", Base64.encodeToString(notificationHeader.getBytes("UTF-8"), Base64.URL_SAFE|Base64.NO_WRAP));
-                post.addHeader("notifdescription", Base64.encodeToString(notificationBody.getBytes("UTF-8"), Base64.URL_SAFE|Base64.NO_WRAP));
+                post.addHeader("notifheader", Base64.encodeToString(notificationHeader.getBytes("UTF-8"), Base64.URL_SAFE | Base64.NO_WRAP));
+                post.addHeader("notifdescription", Base64.encodeToString(notificationBody.getBytes("UTF-8"), Base64.URL_SAFE | Base64.NO_WRAP));
             } catch (UnsupportedEncodingException e) {
-                post.addHeader("notifheader", Base64.encodeToString(notificationHeader.getBytes(), Base64.URL_SAFE|Base64.NO_WRAP));
-                post.addHeader("notifdescription", Base64.encodeToString(notificationBody.getBytes(), Base64.URL_SAFE|Base64.NO_WRAP));
+                post.addHeader("notifheader", Base64.encodeToString(notificationHeader.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP));
+                post.addHeader("notifdescription", Base64.encodeToString(notificationBody.getBytes(), Base64.URL_SAFE | Base64.NO_WRAP));
             }
 
 
@@ -173,13 +187,15 @@ public class NotificationUtilities {
 
             ArrayList<String> notificationData = new ArrayList<String>();
 
-            if (extras.get("android.title") != null) notificationData.add(extras.get("android.title").toString());
-            if (extras.get("android.text") != null) notificationData.add(extras.get("android.text").toString());
-            if (extras.get("android.subText") != null) notificationData.add(extras.get("android.subText").toString());
+            if (extras.get("android.title") != null)
+                notificationData.add(extras.get("android.title").toString());
+            if (extras.get("android.text") != null)
+                notificationData.add(extras.get("android.text").toString());
+            if (extras.get("android.subText") != null)
+                notificationData.add(extras.get("android.subText").toString());
 
             return notificationData;
-        }
-        else {
+        } else {
 
             RemoteViews views = notification.contentView;
             Class<?> secretClass = views.getClass();

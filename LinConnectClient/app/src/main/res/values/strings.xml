@@ -26,9 +26,10 @@
     <string name="pref_donate_play_summary">Tap here to donate by purchasing Donation Key</string>
     <string name="pref_donate_btc">Tap here to donate via Bitcoin</string>
     <string name="pref_donate_btc_summary">Donate via Bitcoin</string>
+    <string name="pref_ssid">Allowed SSIDs</string>
+    <string name="pref_ssid_summary">Insert the allowed SSIDs separated by \',\'</string>
     
     <!-- strings of xml/pref_application.xml -->
     <string name="header_application">Installed Applications</string>
     <string name="pref_all">Check/uncheck all</string>
-
 </resources>

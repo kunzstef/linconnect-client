@@ -56,10 +56,8 @@ public class NotificationUtilities {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(c);
 
-        ConnectivityManager connManager = (ConnectivityManager) c
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager
-                .getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        ConnectivityManager connManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         // Check Wifi state, whether notifications are enabled globally, and
         // whether notifications are enabled for specific application

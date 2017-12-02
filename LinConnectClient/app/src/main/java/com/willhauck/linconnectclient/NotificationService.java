@@ -24,17 +24,18 @@ import android.os.Build;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
+import com.willhauck.linconnectclient.OldNotificationService.NotifyTask;
+
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class NotificationService extends NotificationListenerService {
 
-	@Override
-	public void onNotificationPosted(StatusBarNotification arg0) {
-		NotificationUtilities.sendData(getApplicationContext(),
-				arg0.getNotification(), arg0.getPackageName());
-	}
+    @Override
+    public void onNotificationPosted(StatusBarNotification arg0) {
+        NotifyTask task = new NotifyTask();
+        task.execute(getApplicationContext(), arg0.getNotification(), arg0.getPackageName().toString());
+    }
 
-	@Override
-	public void onNotificationRemoved(StatusBarNotification arg0) {
-	}
-
+    @Override
+    public void onNotificationRemoved(StatusBarNotification arg0) {
+    }
 }

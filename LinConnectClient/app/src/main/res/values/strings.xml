@@ -6,7 +6,7 @@
     <string name="description">LinConnect mirrors Android notifications on a Linux deskop.</string>
     <string name="configuration">Configuration</string>
     <string name="information">Information</string>
-    
+
     <!-- strings of xml/pref_general.xml -->
     <string name="pref_toggle">Enable LinConnect</string>
     <string name="pref_download">Step 1: Download server on desktop</string>
@@ -26,9 +26,9 @@
     <string name="pref_donate_play_summary">Tap here to donate by purchasing Donation Key</string>
     <string name="pref_donate_btc">Tap here to donate via Bitcoin</string>
     <string name="pref_donate_btc_summary">Donate via Bitcoin</string>
-    <string name="pref_ssid">Allowed SSIDs</string>
-    <string name="pref_ssid_summary">Insert the allowed SSIDs separated by \',\'</string>
-    
+    <string name="pref_ssid">Allowed SSIDs (empty=only hotspot)</string>
+    <string name="pref_ssid_summary">Insert allowed SSIDs separated by \',\'. If empty only allowed with enabled hotspot.</string>
+
     <!-- strings of xml/pref_application.xml -->
     <string name="header_application">Installed Applications</string>
     <string name="pref_all">Check/uncheck all</string>

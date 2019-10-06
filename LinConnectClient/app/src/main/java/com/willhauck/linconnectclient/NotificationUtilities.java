@@ -28,6 +28,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -47,6 +48,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
@@ -56,28 +59,47 @@ public class NotificationUtilities {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(c);
 
-        ConnectivityManager connManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
         // Check Wifi state, whether notifications are enabled globally, and
         // whether notifications are enabled for specific application
-        if (prefs.getBoolean("pref_toggle", true)
-                && prefs.getBoolean(packageName, true) && mWifi.isConnected()) {
-            String ssid = mWifi.getExtraInfo();
-            boolean ssidAllowed = false;
+        if (!prefs.getBoolean("pref_toggle", true) || !prefs.getBoolean(packageName, true)) {
+            return false;
+        }
 
-            if (ssid != null) {
-                String ssidPref = prefs.getString("pref_ssid", null);
-                String[] ssids = (ssidPref == null || ssidPref.length() == 0) ? new String[0] : ssidPref.split(",");
-                ssid = ssid.replace("\"", "");
-                for (int i = 0; i < ssids.length && !ssidAllowed; i++)
-                    if (ssids[i].equals(ssid))
-                        ssidAllowed = true;
+        boolean allowed = false;
+        String ssidPref = prefs.getString("pref_ssid", null);
+        String[] ssids = (ssidPref == null || ssidPref.length() == 0) ? new String[0] : ssidPref.split(",");
+
+        if (ssids.length == 0) { // hotspot -> check status
+            WifiManager wifiManager = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
+            Method method = null;
+
+            try {
+                method = wifiManager.getClass().getDeclaredMethod("getWifiApState");
+                method.setAccessible(true);
+                int actualState = (Integer) method.invoke(wifiManager, (Object[]) null);
+                allowed = actualState == 13; // AP_STATE_ENABLED
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
             }
+        } else { // wifi -> check ssid
+            ConnectivityManager connManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-            if (!ssidAllowed)
-                return false;
+            if (mWifi.isConnected()) {
+                String ssid = mWifi.getExtraInfo();
 
+                if (ssid != null) {
+                    ssid = ssid.replace("\"", "");
+
+                    for (int i = 0; i < ssids.length && !allowed; i++)
+                        if (ssids[i].equals(ssid))
+                            allowed = true;
+                }
+
+            }
+        }
+
+        if (allowed) {
             String ip = prefs.getString("pref_ip", "0.0.0.0:9090");
 
             // Magically extract text from notification
@@ -173,6 +195,7 @@ public class NotificationUtilities {
             }
 
         }
+
         return false;
     }
 
